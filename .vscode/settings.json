@@ -1,0 +1,77 @@
+{
+    // Python interpreter - MUST use backend venv
+    "python.defaultInterpreterPath": "${workspaceFolder}/backend/venv/bin/python",
+    "python.pythonPath": "${workspaceFolder}/backend/venv/bin/python",
+
+    // Python testing configuration
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.cwd": "${workspaceFolder}/backend",
+    "python.envFile": "${workspaceFolder}/backend/.env",
+
+    // Python formatting and linting
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/backend"
+    ],
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}/backend"
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+    "black-formatter.args": ["--line-length", "100"],
+    "isort.args": ["--profile", "black", "--line-length", "100"],
+    "flake8.args": ["--max-line-length=100", "--extend-ignore=E203,W503"],
+
+    // TypeScript/JavaScript formatting and linting
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        }
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        }
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        }
+    },
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        }
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+
+    // General editor settings
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true
+}
