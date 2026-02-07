@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     )
 
     openai_api_key: str
+    openai_model: str = "gpt-4o-mini"
+    openai_max_tokens: int = 500
     allowed_origins: str = "http://localhost:3000"
     rate_limit_requests: int = 20
     rate_limit_window: int = 3600
