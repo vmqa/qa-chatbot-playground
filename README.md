@@ -66,7 +66,7 @@ This ensures VS Code uses the correct environment for linting, testing, and auto
 ```bash
 cd frontend
 npm install
-cp .env.local.example .env.local
+cp .env.local.example .env.local  # Optional: only needed if backend runs on different port
 npm run dev
 ```
 
