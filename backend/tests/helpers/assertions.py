@@ -30,9 +30,9 @@ def assert_contains_text(response: str, expected: str) -> None:
     """
     response_lower = response.lower()
     expected_lower = expected.lower()
-    assert expected_lower in response_lower, (
-        f"Response should contain '{expected}'. Got: {response}"
-    )
+    assert (
+        expected_lower in response_lower
+    ), f"Response should contain '{expected}'. Got: {response}"
 
 
 def assert_not_contains_text(response: str, unexpected: str) -> None:
@@ -45,6 +45,6 @@ def assert_not_contains_text(response: str, unexpected: str) -> None:
     """
     response_lower = response.lower()
     unexpected_lower = unexpected.lower()
-    assert unexpected_lower not in response_lower, (
-        f"Response should not contain '{unexpected}'. Got: {response}"
-    )
+    assert (
+        unexpected_lower not in response_lower
+    ), f"Response should not contain '{unexpected}'. Got: {response}"

@@ -34,9 +34,7 @@ def ask_question_with_history(
     Returns:
         Response object from the chat endpoint.
     """
-    return test_client.post(
-        "/api/chat", json={"message": question, "history": history}
-    )
+    return test_client.post("/api/chat", json={"message": question, "history": history})
 
 
 def history_from_turn(user_message: str, assistant_message: str) -> list[dict[str, str]]:

@@ -76,7 +76,7 @@ async def generate_sse_stream(
                 data = json.dumps({"content": chunk})
                 yield f"data: {data}\n\n"
             yield "data: [DONE]\n\n"
-        except OpenAIError as e:
+        except OpenAIError:
             error_data = json.dumps({"error": "Failed to generate response"})
             yield f"data: {error_data}\n\n"
 
