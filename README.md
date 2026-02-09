@@ -26,9 +26,9 @@ Install these before starting:
 - [VS Code](https://code.visualstudio.com/) (recommended)
 - [OpenAI API key](https://platform.openai.com/api-keys) - you'll add this to `.env` file during backend setup
 
-**VS Code Extensions (Recommended):**
+**VS Code Extensions (Optional):**
 
-When you open this project in VS Code, you'll see a notification to install recommended extensions. Click **"Install All"** to get:
+These extensions are not required but helpful for a better development experience:
 
 - Python, Black, isort, flake8 (Python formatting/linting)
 - Prettier, ESLint (TypeScript/JavaScript formatting/linting)
