@@ -30,7 +30,7 @@ Install these before starting:
 
 These extensions are not required but helpful for a better development experience:
 
-- Python, Black, isort, flake8 (Python formatting/linting)
+- Python, Black, isort, ruff (Python formatting/linting)
 - Prettier, ESLint (TypeScript/JavaScript formatting/linting)
 
 ### Backend
@@ -45,9 +45,11 @@ cp .env.example .env                   # Step 4: Copy .env.example to .env file
 uvicorn app.main:app --reload --port 8000       #Start the Backend Server
 ```
 
-**VS Code Setup SetUp help (after Step 3):**
+**VS Code Setup help (after Step 3):**
 
-After running `pip install -r requirements.txt`, select the Python interpreter in VS Code:
+> ℹ️ After running `pip install`, VS Code may show: _"You may have installed Python packages into your global environment..."_ — click **"Don't show again"**. The venv is already active in your terminal; VS Code just hasn't detected it yet.
+
+Select the Python interpreter in VS Code so it recognizes your virtual environment:
 
 1. Open any Python file in the `backend` folder
 2. Click on the Python version in the **bottom-right corner** of VS Code (e.g., "3.14.0 64-bit")
@@ -59,7 +61,7 @@ After running `pip install -r requirements.txt`, select the Python interpreter i
 5. Reload VS Code: `Cmd/Ctrl + Shift + P` → `Developer: Reload Window`
 6. Verify the correct interpreter is selected (bottom-right should show `venv`)
 
-This ensures VS Code uses the correct environment for linting, testing, and auto-completion.
+This ensures VS Code uses the correct environment and avoids the "install into global environment" notification.
 
 ### Frontend
 
