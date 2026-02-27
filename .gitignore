@@ -51,13 +51,14 @@ coverage/
 test-results/
 playwright-report/
 playwright/.cache/
+blob-report/
+.auth/
+.playwright-cli/
 
 # Build artifacts
 *.pyc
 .cache/
 
-# Claude Code
-CLAUDE.md
-
 # Course plan
 COURSE_PLAN.md
+frontend/tests/CLAUDE.md

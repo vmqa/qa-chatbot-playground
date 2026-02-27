@@ -1,8 +1,16 @@
+# Stop servers and remove Next.js lock/cache
+unlock: stop
+	@echo "Cleaning Next.js cache and lock files..."
+	@rm -rf frontend/.next/dev/lock frontend/.next
 .PHONY: start stop restart start-backend start-frontend test test-backend test-frontend
 
 start: ## Start both backend and frontend
 	@make start-backend
 	@make start-frontend
+
+clean-start: ## Reset servers + caches, then start everything again
+	@make unlock
+	@make start
 
 start-backend: ## Start backend server
 	@echo "Starting backend..."

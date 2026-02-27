@@ -42,6 +42,7 @@ npm run test:report
 ### In CI/CD
 
 Tests run automatically on:
+
 - Pull requests that modify `frontend/**` files
 - Direct pushes to `main` branch that modify `frontend/**` files
 
@@ -52,6 +53,7 @@ Tests run automatically on:
 ### Current Tests
 
 **main-chat-page.spec.ts** - Smoke test for chatbot functionality
+
 - Verifies chat input focus on page load
 - Verifies send button is disabled when input is empty
 - Sends "Hello" message
@@ -64,15 +66,18 @@ Tests run automatically on:
 ### MainChatPage
 
 **Locators:**
+
 - Dynamic locator methods (private, synchronous)
 - Returns `Locator` objects
 
 **Actions:**
+
 - User interactions: `goto()`, `fillChatInput()`, `clickSubmit()`, etc.
 - Decorated with `@step()` for test reporting
 - Public async methods
 
 **Assertions:**
+
 - Verification methods: `toHaveHeroTitle()`, `toHaveUserMessage()`, etc.
 - Decorated with `@step()` for test reporting
 - Public async methods
@@ -80,9 +85,11 @@ Tests run automatically on:
 ## Test Data
 
 **GREETING_MARKERS** - Expected terms in greeting responses:
+
 - `['hi', 'hello', 'help', 'marco']`
 
 **PORTFOLIO_MARKERS** - Expected terms in portfolio-related responses:
+
 - `['qa', 'quality', 'testing', 'playwright', 'automation', 'istqb', 'marco']`
 
 ## Non-Deterministic Response Handling
@@ -117,10 +124,12 @@ This verifies the response contains **at least one** of the expected markers (ca
 ### @step() Decorator Usage
 
 **DO:**
+
 - Use `@step()` on async class methods in POM files
 - Use for reusable actions and assertions
 
 **DON'T:**
+
 - Use on synchronous methods
 - Use on private locator methods
 - Wrap `@step()`-decorated methods with `test.step()` in tests (causes double steps)
@@ -145,16 +154,19 @@ await mainChatPage.clickSubmit();
 **File:** `.github/workflows/frontend-tests.yml`
 
 **Triggers:**
+
 - PR to main (frontend changes only)
 - Push to main (frontend changes only)
 
 **Environment:**
+
 - Ubuntu latest
 - Node.js 18
 - Chromium browser
 - Production backend API
 
 **Artifacts on Failure:**
+
 - HTML test report
 - Screenshots
 - Trace files
@@ -174,15 +186,18 @@ await mainChatPage.clickSubmit();
 ## Troubleshooting
 
 ### Tests fail locally but pass in CI
+
 - Check `NEXT_PUBLIC_API_URL` environment variable
 - Ensure backend is running (dev server or production)
 
 ### Tests timeout
+
 - Check network connectivity to backend
 - Verify backend is responding (check Railway/production status)
 - Increase timeout in `playwright.config.ts` if needed
 
 ### Flaky tests
+
 - Add explicit waits for dynamic content
 - Use Playwright's auto-waiting assertions
 - Avoid hardcoded timeouts (`page.waitForTimeout()`)
@@ -192,3 +207,16 @@ await mainChatPage.clickSubmit();
 - [Playwright Documentation](https://playwright.dev)
 - [Playwright Best Practices](https://playwright.dev/docs/best-practices)
 - [Page Object Model Pattern](https://playwright.dev/docs/pom)
+
+## playwright-cli Setup
+
+After running `playwright-cli install --skills` from the repo root, append the following to `.claude/skills/playwright-cli/SKILL.md`:
+
+```markdown
+## Agent workflows
+
+For structured, multi-step workflows use the dedicated instruction files:
+
+- **Test planning** — when asked to create a test plan for a page or feature, follow the instructions in [frontend/tests/TEST_PLANNING.md](../../../frontend/tests/TEST_PLANNING.md)
+- **Test code generation** — when asked to generate, fix or write Playwright test code, follow the coding standards in [frontend/tests/CLAUDE.md](../../../frontend/tests/CLAUDE.md)
+```
