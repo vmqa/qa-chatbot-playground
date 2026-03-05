@@ -62,6 +62,7 @@ export default function Header({ currentPage = "home" }: HeaderProps) {
           {/* Mobile menu button */}
           <button
             type="button"
+            data-testid="mobile-menu-button"
             className="md:hidden p-2 rounded-md text-[var(--text-secondary)] hover:text-[var(--primary)] hover:bg-[var(--border)]"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
@@ -93,7 +94,7 @@ export default function Header({ currentPage = "home" }: HeaderProps) {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-[var(--border)]">
+          <div data-testid="mobile-menu" className="md:hidden py-4 border-t border-[var(--border)]">
             <a
               href="/"
               className={`block py-2 cursor-pointer ${
