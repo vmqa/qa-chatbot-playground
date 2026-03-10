@@ -16,8 +16,8 @@ export const EXAMPLE_QUESTIONS = [
     question: "Is Selenium still alive now?",
   },
   {
-    label: "Test Automation",
-    question: "How to start in test automation?",
+    label: "AI Agentic development",
+    question: "How do you set up testing process in agentic AI development pipeline?",
   },
 ] as const;
 

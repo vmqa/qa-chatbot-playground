@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 import { MainChatPage } from "~pom/MainChatPage.pom";
 import { BlogPage } from "~pom/BlogPage.pom";
-import { GREETING_MARKERS, TEST_AUTOMATION_MARKERS } from "~fixtures/test-data";
+import { GREETING_MARKERS, AI_AGENTIC_MARKERS } from "~fixtures/test-data";
 
 test.describe("Main Chat Page", () => {
   let mainChatPage: MainChatPage;
@@ -40,16 +40,18 @@ test.describe("Main Chat Page", () => {
         "How to approach AI testing today?",
       );
       await mainChatPage.toHaveSubmitButtonBeEnabled();
-      await mainChatPage.clickExampleQuestion("Test Automation");
+      await mainChatPage.clickExampleQuestion("AI Agentic development");
       await mainChatPage.toHaveExampleChatInput(
-        "How to start in test automation?",
+        "How do you set up testing process in agentic AI development pipeline?",
       );
     });
 
     await test.step("Verify assistant response", async () => {
       await mainChatPage.submitWithEnter();
-      await mainChatPage.toHaveUserMessage("How to start in test automation?");
-      await mainChatPage.toHaveAssistantMessageContaining(TEST_AUTOMATION_MARKERS);
+      await mainChatPage.toHaveUserMessage(
+        "How do you set up testing process in agentic AI development pipeline?",
+      );
+      await mainChatPage.toHaveAssistantMessageContaining(AI_AGENTIC_MARKERS);
     });
   });
 
