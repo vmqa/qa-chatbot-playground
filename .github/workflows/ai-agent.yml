@@ -166,10 +166,14 @@ jobs:
 
       # -----------------------------------------------------------------------
       # 9. Backend validation tests — uses TestClient (no running server needed)
+      #    OPENAI_API_KEY must be present so Pydantic Settings initialises the app;
+      #    no actual OpenAI calls are made by these tests.
       # -----------------------------------------------------------------------
       - name: Run backend validation tests
         if: success() && steps.branch-check.outputs.exists == 'false'
         working-directory: ./backend
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python -m pytest tests/test_validation.py -v
 
       # -----------------------------------------------------------------------
