@@ -1,0 +1,67 @@
+name: AI Feature Request
+description: Trigger the AI agent to automatically implement, test, and submit a PR for this feature. Add the "ai-implement" label after submitting to start the pipeline.
+title: "[AI] "
+labels: ["ai-feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill in the fields below to describe the feature. When ready, submit and then add the **`ai-implement`** label to trigger the automated pipeline.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: One paragraph describing what should be built. Be specific about the user-facing behavior.
+      placeholder: "Example: Add a character counter below the chat input that shows remaining characters (max 1000). It should update in real-time as the user types and turn red when fewer than 50 characters remain."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Bullet list of testable conditions that must be true for this feature to be complete.
+      placeholder: |
+        - Character counter is visible below the chat input
+        - Counter shows "1000 / 1000" initially
+        - Counter updates as the user types
+        - Counter turns red when fewer than 50 characters remain
+        - Counter has data-testid="char-counter"
+    validations:
+      required: true
+
+  - type: textarea
+    id: files-affected
+    attributes:
+      label: Files Likely Affected
+      description: Optional. Helps the agent focus on the right parts of the codebase.
+      placeholder: |
+        - frontend/src/components/ChatInput.tsx
+        - backend/app/routes/chat.py
+    validations:
+      required: false
+
+  - type: textarea
+    id: test-hints
+    attributes:
+      label: Test Hints
+      description: Optional. Guidance for what the Playwright tests should verify.
+      placeholder: |
+        - Verify counter updates on keystroke
+        - Verify counter color changes near the limit
+        - Verify counter is visible on mobile viewport
+    validations:
+      required: false
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Change Scope
+      description: Which part of the codebase does this primarily affect?
+      options:
+        - Frontend only
+        - Backend only
+        - Full stack (both)
+    validations:
+      required: true

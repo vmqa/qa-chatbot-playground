@@ -1,0 +1,326 @@
+name: AI Agent — Implement Feature
+
+on:
+  issues:
+    types: [labeled]
+
+# Concurrency: one run per issue at a time; cancel in-progress if relabeled
+concurrency:
+  group: ai-agent-issue-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  implement:
+    # Guard: only fire on the ai-implement label
+    if: github.event.label.name == 'ai-implement'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      # -----------------------------------------------------------------------
+      # 1. Checkout (full history for branch operations)
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # -----------------------------------------------------------------------
+      # 2. Duplicate-run guard — skip if a branch for this issue already exists
+      # -----------------------------------------------------------------------
+      - name: Check for existing feature branch
+        id: branch-check
+        run: |
+          BRANCH_PATTERN="feature/issue-${{ github.event.issue.number }}-"
+          if git ls-remote --heads origin "${BRANCH_PATTERN}*" | grep -q .; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Branch for issue #${{ github.event.issue.number }} already exists. Skipping."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment if branch already exists
+        if: steps.branch-check.outputs.exists == 'true'
+        run: |
+          gh issue comment ${{ github.event.issue.number }} \
+            --body "⚠️ **AI Agent skipped**: A feature branch for this issue already exists. Delete the existing branch or PR first, then re-add the \`ai-implement\` label to retry."
+
+      # -----------------------------------------------------------------------
+      # 3. Create feature branch (slug fallback for non-latin / empty titles)
+      # -----------------------------------------------------------------------
+      - name: Create feature branch
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        id: branch
+        run: |
+          SLUG=$(echo "${{ github.event.issue.title }}" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed 's/[^a-z0-9]/-/g' \
+            | sed 's/--*/-/g' \
+            | sed 's/^-//;s/-$//' \
+            | cut -c1-40)
+          # Fallback: if slug is empty after cleaning (e.g. non-latin title), use "feature"
+          SLUG="${SLUG:-feature}"
+          BRANCH="feature/issue-${{ github.event.issue.number }}-${SLUG}"
+          echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+          git checkout -b "${BRANCH}"
+          echo "Created branch: ${BRANCH}"
+
+      # -----------------------------------------------------------------------
+      # 4. Setup Python + install backend dependencies
+      # -----------------------------------------------------------------------
+      - name: Set up Python 3.11
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # -----------------------------------------------------------------------
+      # 5. Setup Node.js + install frontend dependencies
+      # -----------------------------------------------------------------------
+      - name: Setup Node.js 20
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        working-directory: ./frontend
+        run: npx playwright install --with-deps chromium
+
+      # -----------------------------------------------------------------------
+      # 6. Install Claude Code CLI
+      # -----------------------------------------------------------------------
+      - name: Install Claude Code CLI
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        run: npm install -g @anthropic-ai/claude-code
+
+      # -----------------------------------------------------------------------
+      # 7. Build agent prompt (issue body treated as untrusted data)
+      # -----------------------------------------------------------------------
+      - name: Build agent prompt
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          REPO_ROOT: ${{ github.workspace }}
+          AGENT_PROMPT_FILE: /tmp/agent-prompt.txt
+        run: bash .github/scripts/build-agent-prompt.sh
+
+      # -----------------------------------------------------------------------
+      # 8. Run Claude Code agent — reads/writes files only, no browser needed
+      # -----------------------------------------------------------------------
+      - name: Run AI agent
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude \
+            --print \
+            --model claude-sonnet-4-6 \
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash" \
+            --max-turns 20 \
+            "$(cat /tmp/agent-prompt.txt)"
+
+      # -----------------------------------------------------------------------
+      # 9. Backend validation tests — uses TestClient (no running server needed)
+      # -----------------------------------------------------------------------
+      - name: Run backend validation tests
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        working-directory: ./backend
+        run: python -m pytest tests/test_validation.py -v
+
+      # -----------------------------------------------------------------------
+      # 10. Start backend server (needed for Playwright E2E tests)
+      # -----------------------------------------------------------------------
+      - name: Start backend server
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        working-directory: ./backend
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+          echo "Waiting for backend..."
+          sleep 5
+          curl --retry 10 --retry-delay 2 --retry-connrefused http://localhost:8000/health
+
+      # -----------------------------------------------------------------------
+      # 11. Build frontend and start in production mode (deterministic for CI)
+      #     Deferred until after Claude so the build captures all written files.
+      # -----------------------------------------------------------------------
+      - name: Build frontend
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Start frontend server
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        working-directory: ./frontend
+        run: |
+          npx next start --port 3000 &
+          echo "Waiting for frontend..."
+          sleep 5
+          curl --retry 10 --retry-delay 3 --retry-connrefused http://localhost:3000
+
+      # -----------------------------------------------------------------------
+      # 12. Run targeted Playwright test (only the new spec Claude wrote)
+      # -----------------------------------------------------------------------
+      - name: Run targeted Playwright tests
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        id: playwright
+        working-directory: ./frontend
+        run: |
+          if [ -f /tmp/new-spec-path.txt ]; then
+            SPEC_PATH=$(cat /tmp/new-spec-path.txt | tr -d '[:space:]')
+            echo "Running spec: ${SPEC_PATH}"
+            npx playwright test "${SPEC_PATH}" --reporter=html
+          else
+            echo "No new spec path found in /tmp/new-spec-path.txt — running full suite as fallback."
+            npx playwright test --reporter=html
+          fi
+
+      # -----------------------------------------------------------------------
+      # 13. Upload test artifacts on failure
+      # -----------------------------------------------------------------------
+      - name: Upload Playwright report on failure
+        if: failure() && steps.branch-check.outputs.exists == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-issue-${{ github.event.issue.number }}
+          path: frontend/playwright-report/
+          retention-days: 7
+
+      - name: Upload screenshots on failure
+        if: failure() && steps.branch-check.outputs.exists == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-screenshots-issue-${{ github.event.issue.number }}
+          path: frontend/test-results/
+          retention-days: 7
+
+      # -----------------------------------------------------------------------
+      # 14. Comment on issue if tests failed
+      # -----------------------------------------------------------------------
+      - name: Comment test failure on issue
+        if: failure() && steps.branch-check.outputs.exists == 'false'
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          gh issue comment ${{ github.event.issue.number }} \
+            --body "❌ **AI Agent failed**: Tests did not pass after implementation.
+
+          [View workflow run and artifacts](${RUN_URL})
+
+          To retry: refine the issue description or acceptance criteria, then re-add the \`ai-implement\` label."
+
+      # -----------------------------------------------------------------------
+      # 15. Commit changes and push branch
+      #     Stage backend/ and frontend/ broadly — .gitignore protects venv + node_modules.
+      #     Outputs committed=true only when a commit was actually created.
+      # -----------------------------------------------------------------------
+      - name: Commit and push
+        if: success() && steps.branch-check.outputs.exists == 'false'
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add backend/ frontend/
+          if git diff --cached --quiet; then
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes to commit — agent made no file modifications."
+          else
+            git commit -m "feat: implement issue #${{ github.event.issue.number }} - ${{ github.event.issue.title }}
+
+          AI-generated implementation via GitHub Actions.
+          Closes #${{ github.event.issue.number }}"
+            git push origin "${{ steps.branch.outputs.branch }}"
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # -----------------------------------------------------------------------
+      # 16. Ensure the "ai-generated" label exists before creating the PR
+      #     --force updates description/color if already present; || true is a no-op safety net.
+      # -----------------------------------------------------------------------
+      - name: Ensure ai-generated label exists
+        if: success() && steps.branch-check.outputs.exists == 'false' && steps.commit.outputs.committed == 'true'
+        run: |
+          gh label create "ai-generated" \
+            --color "0075ca" \
+            --description "Created by the AI agent pipeline" \
+            --force 2>/dev/null || true
+
+      # -----------------------------------------------------------------------
+      # 17. Create pull request (only if commit was made)
+      # -----------------------------------------------------------------------
+      - name: Create pull request
+        if: success() && steps.branch-check.outputs.exists == 'false' && steps.commit.outputs.committed == 'true'
+        id: create-pr
+        run: |
+          ISSUE_NUM="${{ github.event.issue.number }}"
+          BRANCH="${{ steps.branch.outputs.branch }}"
+          PR_URL=$(gh pr create \
+            --title "feat: ${{ github.event.issue.title }}" \
+            --body "## Summary
+
+          AI-generated implementation for issue #${ISSUE_NUM}.
+
+          ## Related Issue
+
+          Closes #${ISSUE_NUM}
+
+          ## Change Type
+
+          - [x] AI Generated
+
+          ## Test Coverage
+
+          - [x] Playwright spec added by AI agent
+          - [x] Backend validation tests pass
+
+          ## Reviewer Checklist
+
+          - [ ] Code follows standards in \`CLAUDE.md\`
+          - [ ] All new UI elements have \`data-testid\` attributes
+          - [ ] No secrets or API keys committed
+          - [ ] CI checks pass" \
+            --head "${BRANCH}" \
+            --base main \
+            --label "ai-generated")
+          echo "pr_url=${PR_URL}" >> "$GITHUB_OUTPUT"
+          echo "Pull request created: ${PR_URL}"
+
+      # -----------------------------------------------------------------------
+      # 18. Comment PR link on the original issue
+      # -----------------------------------------------------------------------
+      - name: Comment PR link on issue
+        if: success() && steps.branch-check.outputs.exists == 'false' && steps.commit.outputs.committed == 'true'
+        run: |
+          gh issue comment ${{ github.event.issue.number }} \
+            --body "✅ **AI Agent completed**: Implementation is ready for review.
+
+          Pull request: ${{ steps.create-pr.outputs.pr_url }}
+
+          CI checks are now running on the PR. Please review before merging."

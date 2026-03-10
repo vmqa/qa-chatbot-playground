@@ -1,0 +1,10 @@
+# CODEOWNERS
+# Each line is a file pattern followed by one or more owners.
+# Owners are automatically requested for review on any PR that modifies matching files.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owner — review required on all PRs (including AI-generated ones)
+* @vmqa
+
+# AI-generated workflow files require explicit review
+.github/workflows/ @vmqa
