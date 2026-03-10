@@ -133,36 +133,18 @@ jobs:
 
       # -----------------------------------------------------------------------
       # 8. Run Claude Code agent — reads/writes files only, no browser needed
-      # TODO: Remove the DRY RUN block below and uncomment the real claude invocation
-      #       once the pipeline trigger, branch, server, and PR flow are verified.
       # -----------------------------------------------------------------------
-      - name: Run AI agent (DRY RUN)
+      - name: Run AI agent
         if: success() && steps.branch-check.outputs.exists == 'false'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          echo "=== DRY RUN: Claude agent would run here ==="
-          echo "Prompt size: $(wc -c < /tmp/agent-prompt.txt) bytes"
-          echo ""
-          echo "--- Prompt preview (first 30 lines) ---"
-          head -30 /tmp/agent-prompt.txt
-          echo "--- end preview ---"
-          # Minimal file change so the commit step produces committed=true
-          echo "# AI pipeline dry-run marker — safe to delete" > frontend/src/.pipeline-dry-run
-          # Point to an existing spec so the targeted Playwright run works
-          echo "tests/specs/main-chat-page.spec.ts" > /tmp/new-spec-path.txt
-          echo "Spec path set to: $(cat /tmp/new-spec-path.txt)"
-
-      # Uncomment below (and delete the DRY RUN step above) to enable the real agent:
-      # - name: Run AI agent
-      #   if: success() && steps.branch-check.outputs.exists == 'false'
-      #   env:
-      #     ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      #   run: |
-      #     claude \
-      #       --print \
-      #       --model claude-sonnet-4-6 \
-      #       --allowedTools "Read,Write,Edit,Glob,Grep,Bash" \
-      #       --max-turns 20 \
-      #       "$(cat /tmp/agent-prompt.txt)"
+          claude \
+            --print \
+            --model claude-sonnet-4-6 \
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash" \
+            --max-turns 20 \
+            "$(cat /tmp/agent-prompt.txt)"
 
       # -----------------------------------------------------------------------
       # 9. Backend validation tests — uses TestClient (no running server needed)
