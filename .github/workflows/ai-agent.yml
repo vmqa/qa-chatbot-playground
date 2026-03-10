@@ -191,25 +191,10 @@ jobs:
           curl --retry 10 --retry-delay 2 --retry-connrefused http://localhost:8000/health
 
       # -----------------------------------------------------------------------
-      # 11. Build frontend and start in production mode (deterministic for CI)
-      #     Deferred until after Claude so the build captures all written files.
-      # -----------------------------------------------------------------------
-      - name: Build frontend
-        if: success() && steps.branch-check.outputs.exists == 'false'
-        working-directory: ./frontend
-        run: npm run build
-
-      - name: Start frontend server
-        if: success() && steps.branch-check.outputs.exists == 'false'
-        working-directory: ./frontend
-        run: |
-          npx next start --port 3000 &
-          echo "Waiting for frontend..."
-          sleep 5
-          curl --retry 10 --retry-delay 3 --retry-connrefused http://localhost:3000
-
-      # -----------------------------------------------------------------------
-      # 12. Run targeted Playwright test (only the new spec Claude wrote)
+      # 11. Run targeted Playwright test (only the new spec Claude wrote)
+      #     Playwright's webServer config (playwright.config.ts) launches the
+      #     frontend via "npm run dev" automatically — no pre-start needed here.
+      #     This matches the approach used in frontend-tests.yml.
       # -----------------------------------------------------------------------
       - name: Run targeted Playwright tests
         if: success() && steps.branch-check.outputs.exists == 'false'
