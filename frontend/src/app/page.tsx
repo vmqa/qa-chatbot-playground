@@ -157,7 +157,7 @@ export default function Home() {
 
     const history = messages
       .filter((msg) => msg.content.trim().length > 0)
-      .slice(-12)
+      .slice(-10)
       .map((msg) => ({ role: msg.role, content: msg.content }));
 
     const userMessage: Message = {

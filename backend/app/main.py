@@ -4,11 +4,13 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import Response
-from pydantic import ValidationError
 from slowapi.errors import RateLimitExceeded
 
 from app.api.chat import router as chat_router
@@ -22,12 +24,12 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan events."""
-    settings = get_settings()
     if not settings.openai_api_key:
         raise RuntimeError("OPENAI_API_KEY environment variable is not set")
     yield
@@ -51,6 +53,14 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+        )
+        if settings.enforce_https:
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         return response
 
 
@@ -64,13 +74,20 @@ async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) 
     return JSONResponse(
         status_code=429,
         content={"error": "Rate limit exceeded"},
-        headers={"Retry-After": "3600"},
+        headers={"Retry-After": str(settings.rate_limit_window)},
     )
 
 
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
-settings = get_settings()
+if settings.enforce_https:
+    app.add_middleware(HTTPSRedirectMiddleware)
+
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=settings.allowed_hosts_list,
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins_list,
@@ -88,11 +105,11 @@ async def health_check() -> dict[str, str]:
     return {"status": "healthy"}
 
 
-@app.exception_handler(ValidationError)
-async def validation_exception_handler(request: Request, exc: ValidationError) -> JSONResponse:
-    """Handle Pydantic validation errors."""
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    """Handle request validation errors with standards-compliant status code."""
     return JSONResponse(
-        status_code=400,
+        status_code=422,
         content={"error": "Validation error"},
     )
 
@@ -100,6 +117,7 @@ async def validation_exception_handler(request: Request, exc: ValidationError) -
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle unexpected errors without leaking internal details."""
+    logger.exception("Unhandled server error")
     return JSONResponse(
         status_code=500,
         content={"error": "Internal server error"},
