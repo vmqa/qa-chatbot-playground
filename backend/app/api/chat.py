@@ -30,7 +30,9 @@ class ChatRequest(BaseModel):
             description="Message role: user or assistant",
             pattern="^(user|assistant)$",
         )
-        content: str = Field(min_length=1, max_length=MAX_MESSAGE_LENGTH, description="Message content")
+        content: str = Field(
+            min_length=1, max_length=MAX_MESSAGE_LENGTH, description="Message content"
+        )
 
     message: Annotated[
         str,
@@ -125,7 +127,9 @@ async def chat(
         len(chat_request.history),
     )
 
-    history_payload = [{"role": item.role, "content": item.content} for item in chat_request.history]
+    history_payload = [
+        {"role": item.role, "content": item.content} for item in chat_request.history
+    ]
     try:
         max_completion_tokens = service.calculate_completion_token_budget(
             chat_request.message,

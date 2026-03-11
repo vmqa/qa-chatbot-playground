@@ -5,23 +5,27 @@ FastAPI backend for the portfolio chatbot.
 ## Setup
 
 1. Create virtual environment:
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 ```
 
 2. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 3. Configure environment:
+
 ```bash
 cp .env.example .env
 # Edit .env with your OPENAI_API_KEY
 ```
 
 4. Run the server:
+
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
@@ -36,15 +40,15 @@ uvicorn app.main:app --reload --port 8000
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `OPENAI_API_KEY` | OpenAI API key (required) | - |
-| `OPENAI_MODEL` | OpenAI model for chat completions | `gpt-4o-mini` |
-| `OPENAI_MAX_TOKENS` | Maximum completion tokens per response | `500` |
-| `OPENAI_MAX_INPUT_TOKENS` | Maximum allowed prompt tokens per request | `2200` |
-| `OPENAI_MAX_TOTAL_TOKENS` | Maximum prompt+completion token budget per request | `2800` |
-| `ALLOWED_ORIGINS` | Comma-separated CORS origins | `http://localhost:3000` |
-| `ALLOWED_HOSTS` | Comma-separated trusted API hostnames | `localhost,127.0.0.1,testserver` |
-| `ENFORCE_HTTPS` | Redirect HTTP to HTTPS and enable HSTS | `false` |
-| `RATE_LIMIT_REQUESTS` | Requests per window | `20` |
-| `RATE_LIMIT_WINDOW` | Window in seconds | `3600` |
+| Variable                  | Description                                        | Default                          |
+| ------------------------- | -------------------------------------------------- | -------------------------------- |
+| `OPENAI_API_KEY`          | OpenAI API key (required)                          | -                                |
+| `OPENAI_MODEL`            | OpenAI model for chat completions                  | `gpt-4o-mini`                    |
+| `OPENAI_MAX_TOKENS`       | Maximum completion tokens per response             | `500`                            |
+| `OPENAI_MAX_INPUT_TOKENS` | Maximum allowed prompt tokens per request          | `2200`                           |
+| `OPENAI_MAX_TOTAL_TOKENS` | Maximum prompt+completion token budget per request | `2800`                           |
+| `ALLOWED_ORIGINS`         | Comma-separated CORS origins                       | `http://localhost:3000`          |
+| `ALLOWED_HOSTS`           | Comma-separated trusted API hostnames              | `localhost,127.0.0.1,testserver` |
+| `ENFORCE_HTTPS`           | Redirect HTTP to HTTPS and enable HSTS             | `false`                          |
+| `RATE_LIMIT_REQUESTS`     | Requests per window                                | `20`                             |
+| `RATE_LIMIT_WINDOW`       | Window in seconds                                  | `3600`                           |

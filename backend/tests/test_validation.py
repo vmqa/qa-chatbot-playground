@@ -8,10 +8,9 @@ Run with: pytest tests/test_validation.py -v
 """
 
 import pytest
-from fastapi.testclient import TestClient
-
 from app.api.chat import get_openai_service
 from app.main import app
+from fastapi.testclient import TestClient
 
 
 @pytest.mark.parametrize(
@@ -31,11 +30,16 @@ def test_chat_rejects_invalid_payloads(test_client: TestClient, payload: dict):
 
 def test_chat_rejects_excessive_token_budget_payload(test_client: TestClient):
     """Chat should reject requests that exceed configured token budget before OpenAI call."""
+
     class BudgetFailService:
-        def calculate_completion_token_budget(self, message: str, history: list[dict[str, str]]) -> int:
+        def calculate_completion_token_budget(
+            self, message: str, history: list[dict[str, str]]
+        ) -> int:
             raise ValueError("Input exceeds configured prompt token budget")
 
-        async def create_chat_stream(self, message: str, history: list[dict[str, str]], max_completion_tokens: int):
+        async def create_chat_stream(
+            self, message: str, history: list[dict[str, str]], max_completion_tokens: int
+        ):
             if False:
                 yield ""
 
