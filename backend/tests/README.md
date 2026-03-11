@@ -1,6 +1,6 @@
 # Backend API Tests
 
-Integration and validation tests for the Ask Marco portfolio chatbot API.
+Integration and validation tests for the Clean Pipes Consulting portfolio chatbot API.
 
 ## Structure
 

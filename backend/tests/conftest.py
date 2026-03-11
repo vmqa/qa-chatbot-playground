@@ -1,4 +1,4 @@
-"""Pytest fixtures for Ask Marco API tests."""
+"""Pytest fixtures for Clean Pipes Consulting API tests."""
 
 import pytest
 from dotenv import load_dotenv

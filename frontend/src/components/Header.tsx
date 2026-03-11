@@ -23,14 +23,14 @@ export default function Header({ currentPage = "home" }: HeaderProps) {
             >
               <Image
                 src="/avatar.png"
-                alt="Ask Marco"
+                alt="Clean Pipes Consulting"
                 width={95}
                 height={95}
                 className="rounded-full object-cover hover:ring-2 hover:ring-[var(--primary)] transition-all"
               />
             </a>
             <a href="/" className="text-xl font-bold text-[var(--primary)]">
-              Ask Marco
+              Clean Pipes Consulting
             </a>
           </div>
 

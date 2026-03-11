@@ -1,4 +1,4 @@
-"""Test helpers for Ask Marco API tests."""
+"""Test helpers for Clean Pipes Consulting API tests."""
 
 from tests.helpers.api import (
     ask_question,

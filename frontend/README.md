@@ -1,4 +1,4 @@
-# Ask Marco - Frontend
+# Clean Pipes Consulting - Frontend
 
 Next.js frontend for the portfolio chatbot.
 

@@ -1,4 +1,4 @@
-"""Test configuration for Ask Marco API tests."""
+"""Test configuration for Clean Pipes Consulting API tests."""
 
 from app.api.chat import MAX_MESSAGE_LENGTH as MAX_MESSAGE_LENGTH  # noqa: F401
 

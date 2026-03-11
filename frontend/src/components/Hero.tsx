@@ -8,7 +8,7 @@ export default function Hero({ onStartChat }: HeroProps) {
       <div className="max-w-3xl mx-auto text-center">
         <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] mb-6">
           Hi, I&apos;m{" "}
-          <span className="text-[var(--primary)]">Marco</span>
+          <span className="text-[var(--primary)]">Clean Pipes Consulting</span>
         </h1>
         <p className="text-xl sm:text-2xl text-[var(--text-secondary)] mb-4">
           QA Engineer
@@ -37,7 +37,7 @@ export default function Hero({ onStartChat }: HeroProps) {
               d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
             />
           </svg>
-          Ask Marco
+          Clean Pipes Consulting
         </button>
       </div>
     </section>

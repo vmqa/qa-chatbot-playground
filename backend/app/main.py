@@ -32,8 +32,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Ask Marco API",
-    description="Portfolio chatbot API for Marco, an AI QA Engineer",
+    title="Clean Pipes Consulting API",
+    description="Portfolio chatbot API for Clean Pipes Consulting, an AI QA Engineer",
     version="1.0.0",
     lifespan=lifespan,
 )
