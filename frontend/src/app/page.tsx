@@ -7,6 +7,9 @@ import { Message, StreamChunk } from '@/types/chat';
 import Header from '@/components/Header';
 import ExampleQuestions from '@/components/ExampleQuestions';
 
+const REQUEST_TIMEOUT_MS = 120000;
+const SLOW_NOTICE_DELAY_MS = 10000;
+
 /**
  * Renders user message with clickable links and emails.
  */
@@ -108,7 +111,7 @@ function renderAssistantMessage(content: string): ReactNode {
     return output.join('\n');
   };
 
-  let fixedContent = normalizePortfolioBullets(content)
+  const fixedContent = normalizePortfolioBullets(content)
     // Fix numbered lists with newline after number
     .replace(/^(\d+)\.\s*\n+/gm, '$1. ')
     .replace(/\n(\d+)\.\s*\n+/g, '\n$1. ')
@@ -152,6 +155,7 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showSlowNotice, setShowSlowNotice] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -193,9 +197,13 @@ export default function Home() {
     const assistantMessageId = generateId();
     setMessages((prev) => [...prev, { id: assistantMessageId, role: 'assistant', content: '' }]);
 
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let slowNoticeId: ReturnType<typeof setTimeout> | null = null;
+
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      slowNoticeId = setTimeout(() => setShowSlowNotice(true), SLOW_NOTICE_DELAY_MS);
 
       const response = await fetch(`${config.apiUrl}/api/chat`, {
         method: 'POST',
@@ -205,8 +213,6 @@ export default function Home() {
         body: JSON.stringify({ message: userMessage.content, history }),
         signal: controller.signal,
       });
-
-      clearTimeout(timeoutId);
 
       if (response.status === 429) {
         throw new Error("You've hit the chat limit for this hour. Please try again later.");
@@ -261,7 +267,7 @@ export default function Home() {
       let errorMessage = 'An unexpected error occurred.';
       if (err instanceof Error) {
         if (err.name === 'AbortError') {
-          errorMessage = 'Request timed out. Please try again.';
+          errorMessage = 'Request timed out after 120 seconds. Please try again.';
         } else {
           errorMessage = err.message;
         }
@@ -269,6 +275,9 @@ export default function Home() {
       setError(errorMessage);
       setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessageId));
     } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (slowNoticeId) clearTimeout(slowNoticeId);
+      setShowSlowNotice(false);
       setIsLoading(false);
       setTimeout(() => {
         inputRef.current?.focus();
@@ -329,17 +338,24 @@ export default function Home() {
                       renderAssistantMessage(message.content)
                     )
                   ) : (
-                    <span className="inline-flex items-center" data-testid="loading-indicator">
-                      <span className="w-2 h-2 bg-[var(--secondary)] rounded-full animate-bounce mr-1"></span>
-                      <span
-                        className="w-2 h-2 bg-[var(--secondary)] rounded-full animate-bounce mr-1"
-                        style={{ animationDelay: '0.1s' }}
-                      ></span>
-                      <span
-                        className="w-2 h-2 bg-[var(--secondary)] rounded-full animate-bounce"
-                        style={{ animationDelay: '0.2s' }}
-                      ></span>
-                    </span>
+                    <div className="space-y-2">
+                      <span className="inline-flex items-center" data-testid="loading-indicator">
+                        <span className="w-2 h-2 bg-[var(--secondary)] rounded-full animate-bounce mr-1"></span>
+                        <span
+                          className="w-2 h-2 bg-[var(--secondary)] rounded-full animate-bounce mr-1"
+                          style={{ animationDelay: '0.1s' }}
+                        ></span>
+                        <span
+                          className="w-2 h-2 bg-[var(--secondary)] rounded-full animate-bounce"
+                          style={{ animationDelay: '0.2s' }}
+                        ></span>
+                      </span>
+                      {showSlowNotice && message.role === 'assistant' && isLoading && (
+                        <p className="text-xs text-[var(--text-secondary)] italic">
+                          Please be patient, our free-tier engine is still starting up...
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
