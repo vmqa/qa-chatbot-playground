@@ -20,3 +20,16 @@ export const TEST_AUTOMATION_MARKERS = [
   'playwright',
   'learn',
 ];
+
+export const AI_AGENTIC_MARKERS = [
+  'agentic',
+  'agent',
+  'pipeline',
+  'testing',
+  'test',
+  'automation',
+  'ci',
+  'cd',
+  'workflow',
+  'ai',
+];
