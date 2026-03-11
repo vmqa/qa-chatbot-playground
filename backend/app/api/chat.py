@@ -30,7 +30,7 @@ class ChatRequest(BaseModel):
             description="Message role: user or assistant",
             pattern="^(user|assistant)$",
         )
-        content: str = Field(min_length=1, description="Message content")
+        content: str = Field(min_length=1, max_length=MAX_MESSAGE_LENGTH, description="Message content")
 
     message: Annotated[
         str,
@@ -42,7 +42,8 @@ class ChatRequest(BaseModel):
     ]
     history: list[ChatMessage] = Field(
         default_factory=list,
-        description="Recent conversation history (user and assistant messages)",
+        max_length=10,
+        description="Recent conversation history (user and assistant messages, max 10)",
     )
 
 

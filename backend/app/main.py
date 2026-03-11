@@ -6,6 +6,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
 from pydantic import ValidationError
 from slowapi.errors import RateLimitExceeded
 
@@ -41,6 +43,20 @@ app = FastAPI(
 app.state.limiter = limiter
 
 
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Add security headers to all responses."""
+
+    async def dispatch(self, request: Request, call_next) -> Response:
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
+
+
 async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
     """Handle rate limit exceeded with logging."""
     client_ip = request.client.host if request.client else "unknown"
@@ -60,7 +76,7 @@ app.add_middleware(
     allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
     allow_methods=["GET", "POST"],
-    allow_headers=["*"],
+    allow_headers=["Content-Type"],
 )
 
 app.include_router(chat_router)
@@ -77,7 +93,7 @@ async def validation_exception_handler(request: Request, exc: ValidationError) -
     """Handle Pydantic validation errors."""
     return JSONResponse(
         status_code=400,
-        content={"error": "Validation error", "detail": str(exc)},
+        content={"error": "Validation error"},
     )
 
 
