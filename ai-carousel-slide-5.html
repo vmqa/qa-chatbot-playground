@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Pipeline Carousel — Slide 5 of 6</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1200px;
+    height: 675px;
+    background: #0a0f1e;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.07) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .blob { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
+  .blob-1 { width: 400px; height: 400px; background: rgba(5,150,105,0.16); top: -100px; left: -80px; }
+  .blob-2 { width: 350px; height: 350px; background: rgba(37,99,235,0.14); bottom: -80px; right: 200px; }
+  .blob-3 { width: 280px; height: 280px; background: rgba(124,58,237,0.12); top: 100px; right: -60px; }
+
+  .canvas {
+    position: relative;
+    width: 1200px;
+    height: 675px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 72px;
+    gap: 0;
+    z-index: 1;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #34d399;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .section-title {
+    font-size: 30px;
+    font-weight: 800;
+    color: #f1f5f9;
+    text-align: center;
+    margin-bottom: 36px;
+    line-height: 1.2;
+  }
+  .section-title span { color: #34d399; }
+
+  /* 3 metric cards */
+  .metrics {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 32px;
+  }
+
+  .metric-card {
+    flex: 1;
+    background: rgba(15,23,42,0.85);
+    border: 1px solid rgba(51,65,85,0.7);
+    border-radius: 18px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 18px 18px 0 0;
+  }
+
+  .metric-card-green { border-color: rgba(5,150,105,0.4); }
+  .metric-card-green::before { background: linear-gradient(90deg, #059669, #34d399); }
+  .metric-card-green .metric-icon { background: rgba(5,150,105,0.18); }
+  .metric-card-green .metric-value { color: #34d399; }
+
+  .metric-card-blue { border-color: rgba(37,99,235,0.4); }
+  .metric-card-blue::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+  .metric-card-blue .metric-icon { background: rgba(37,99,235,0.18); }
+  .metric-card-blue .metric-value { color: #60a5fa; }
+
+  .metric-card-purple { border-color: rgba(124,58,237,0.4); }
+  .metric-card-purple::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+  .metric-card-purple .metric-icon { background: rgba(124,58,237,0.18); }
+  .metric-card-purple .metric-value { color: #a78bfa; }
+
+  .metric-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+  }
+
+  .metric-value {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .metric-label {
+    font-size: 12px;
+    color: #64748b;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* Quote */
+  .quote {
+    background: rgba(15,23,42,0.7);
+    border: 1px solid rgba(51,65,85,0.5);
+    border-left: 3px solid #34d399;
+    border-radius: 10px;
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #cbd5e1;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .slide-num { position: absolute; bottom: 24px; right: 48px; font-size: 11px; font-weight: 700; color: #1e293b; letter-spacing: 1.5px; z-index: 10; }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div class="canvas">
+
+  <div class="eyebrow">AI-Powered Development Pipeline · Slide 5 of 6</div>
+
+  <div class="section-title">Why This <span>Works</span> — Real Results</div>
+
+  <div class="metrics">
+
+    <div class="metric-card metric-card-green">
+      <div class="metric-icon">🟢</div>
+      <div class="metric-value">Zero Extra<br>Infrastructure</div>
+      <div class="metric-label">Runs on GitHub Actions.<br>No servers to manage.</div>
+    </div>
+
+    <div class="metric-card metric-card-blue">
+      <div class="metric-icon">⚡</div>
+      <div class="metric-value">~3 min<br>end-to-end</div>
+      <div class="metric-label">From label click to open PR.<br>~$0.33 per feature in AI cost.</div>
+    </div>
+
+    <div class="metric-card metric-card-purple">
+      <div class="metric-icon">🔒</div>
+      <div class="metric-value">Always<br>Human-Verified</div>
+      <div class="metric-label">Prompt-injection hardened.<br>Human approval on every merge.</div>
+    </div>
+
+  </div>
+
+  <div class="quote">
+    "What would your team ship if small features took minutes, not days?"
+  </div>
+
+</div>
+
+<div class="slide-num">5 / 6</div>
+</body>
+</html>

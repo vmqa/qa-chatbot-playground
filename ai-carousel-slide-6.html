@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Pipeline Carousel — Slide 6 of 6</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1200px;
+    height: 675px;
+    background: #0a0f1e;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.07) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .blob { position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none; }
+  .blob-1 { width: 600px; height: 600px; background: rgba(37,99,235,0.18); top: -200px; right: -150px; }
+  .blob-2 { width: 350px; height: 350px; background: rgba(124,58,237,0.12); bottom: -100px; left: 100px; }
+
+  .canvas {
+    position: relative;
+    width: 1200px;
+    height: 675px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 80px;
+    z-index: 1;
+    gap: 0;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: #3b82f6;
+    margin-bottom: 28px;
+  }
+
+  .cta-label {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 16px;
+    letter-spacing: 0.3px;
+  }
+
+  .cta-title {
+    font-size: 34px;
+    font-weight: 900;
+    color: #f1f5f9;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .cta-arrow {
+    font-size: 34px;
+    font-weight: 900;
+    color: #3b82f6;
+  }
+
+  .link-box {
+    background: rgba(15,23,42,0.9);
+    border: 1px solid rgba(37,99,235,0.4);
+    border-radius: 14px;
+    padding: 18px 40px;
+    margin: 28px 0;
+    display: inline-block;
+  }
+  .link-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #60a5fa;
+    letter-spacing: 0.3px;
+  }
+  .link-text span { color: #93c5fd; }
+
+  .cta-sub {
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 36px;
+  }
+
+  /* Mini pipeline strip */
+  .mini-strip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mini-chip {
+    background: rgba(15,23,42,0.9);
+    border: 1px solid rgba(51,65,85,0.6);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #475569;
+  }
+  .mini-arrow { color: #1e293b; font-size: 12px; font-weight: 700; }
+
+  .slide-num { position: absolute; bottom: 24px; right: 48px; font-size: 11px; font-weight: 700; color: #1e293b; letter-spacing: 1.5px; z-index: 10; }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<div class="canvas">
+
+  <div class="eyebrow">AI-Powered Development Pipeline</div>
+
+  <div class="cta-label">Ready to try this workflow?</div>
+
+  <div class="cta-title">See a Real AI-Generated PR</div>
+  <div class="cta-arrow">↓</div>
+
+  <div class="link-box">
+    <div class="link-text">github.com/vmqa/qa-chatbot-playground/<span>pull/5</span></div>
+  </div>
+
+  <div class="cta-sub">Built with GitHub Issues · AI coding agent · GitHub Actions · Playwright tests</div>
+
+  <div class="mini-strip">
+    <div class="mini-chip">📋 Requirement</div>
+    <div class="mini-arrow">→</div>
+    <div class="mini-chip">🏷️ Label</div>
+    <div class="mini-arrow">→</div>
+    <div class="mini-chip">🤖 Claude</div>
+    <div class="mini-arrow">→</div>
+    <div class="mini-chip">🧪 Tests</div>
+    <div class="mini-arrow">→</div>
+    <div class="mini-chip">📬 PR</div>
+    <div class="mini-arrow">→</div>
+    <div class="mini-chip">👤 Review</div>
+  </div>
+
+  <div class="cta-sub" style="margin-top:14px;margin-bottom:0;">Save this post and share with your engineering team.</div>
+
+</div>
+
+<div class="slide-num">6 / 6</div>
+</body>
+</html>
