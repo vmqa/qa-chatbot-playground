@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: qa-chatbot-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_MAX_TOKENS
+        value: 500
+      - key: OPENAI_MAX_INPUT_TOKENS
+        value: 2200
+      - key: OPENAI_MAX_TOTAL_TOKENS
+        value: 2800
+      - key: ENABLE_IP_DAILY_TOKEN_LIMIT
+        value: true
+      - key: IP_DAILY_TOKEN_LIMIT
+        value: 10000
+      - key: ENFORCE_HTTPS
+        value: true
+      - key: RATE_LIMIT_REQUESTS
+        value: 20
+      - key: RATE_LIMIT_WINDOW
+        value: 3600
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: ALLOWED_HOSTS
+        sync: false
