@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     openai_max_tokens: int = Field(default=500, ge=64, le=2000)
     openai_max_input_tokens: int = Field(default=2200, ge=256, le=120000)
     openai_max_total_tokens: int = Field(default=2800, ge=512, le=128000)
+    enable_ip_daily_token_limit: bool = True
+    ip_daily_token_limit: int = Field(default=10000, ge=100, le=5000000)
     allowed_origins: str = "http://localhost:3000"
     allowed_hosts: str = "localhost,127.0.0.1,testserver"
     enforce_https: bool = False

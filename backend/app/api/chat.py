@@ -11,6 +11,10 @@ from pydantic import BaseModel, Field
 
 from app.middleware.rate_limit import RATE_LIMIT_RULE, limiter
 from app.services.openai_service import OpenAIService, get_openai_service
+from app.services.token_budget_service import (
+    TokenBudgetService,
+    get_token_budget_service,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -113,6 +117,7 @@ async def chat(
     request: Request,
     chat_request: ChatRequest,
     service: Annotated[OpenAIService, Depends(get_openai_service)],
+    token_budget_service: Annotated[TokenBudgetService, Depends(get_token_budget_service)],
 ) -> StreamingResponse:
     """
     Send a message to the chatbot and receive a streaming response.
@@ -131,7 +136,7 @@ async def chat(
         {"role": item.role, "content": item.content} for item in chat_request.history
     ]
     try:
-        max_completion_tokens = service.calculate_completion_token_budget(
+        prompt_tokens, max_completion_tokens = service.plan_request_token_usage(
             chat_request.message,
             history_payload,
         )
@@ -141,6 +146,14 @@ async def chat(
             status_code=400,
             detail="Message exceeds token budget. Shorten the message or clear conversation history.",
         ) from exc
+
+    estimated_request_tokens = prompt_tokens + max_completion_tokens
+    if not token_budget_service.try_consume(client_ip, estimated_request_tokens):
+        logger.warning("[CHAT] IP %s exceeded daily token budget", client_ip)
+        raise HTTPException(
+            status_code=429,
+            detail="Daily token budget exceeded for this IP. Please try again tomorrow.",
+        )
 
     return await generate_sse_stream(
         service,

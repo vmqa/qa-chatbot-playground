@@ -55,10 +55,10 @@ class OpenAIService:
                 tokens += self._count_text_tokens(role)
         return tokens
 
-    def calculate_completion_token_budget(
+    def plan_request_token_usage(
         self, message: str, history: list[dict[str, str]] | None = None
-    ) -> int:
-        """Calculate the allowed completion tokens for a request or raise on budget overflow."""
+    ) -> tuple[int, int]:
+        """Return prompt tokens and safe completion-token budget for a request."""
         history_messages = history or []
         request_messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -76,7 +76,21 @@ class OpenAIService:
         if max_completion_tokens < 64:
             raise ValueError("Conversation is too long to answer safely")
 
-        return max_completion_tokens
+        return prompt_tokens, max_completion_tokens
+
+    def estimate_total_request_tokens(
+        self, message: str, history: list[dict[str, str]] | None = None
+    ) -> int:
+        """Estimate total request token usage (prompt + completion budget)."""
+        prompt_tokens, completion_tokens = self.plan_request_token_usage(message, history)
+        return prompt_tokens + completion_tokens
+
+    def calculate_completion_token_budget(
+        self, message: str, history: list[dict[str, str]] | None = None
+    ) -> int:
+        """Calculate the allowed completion tokens for a request or raise on budget overflow."""
+        _, completion_tokens = self.plan_request_token_usage(message, history)
+        return completion_tokens
 
     async def create_chat_stream(
         self,
