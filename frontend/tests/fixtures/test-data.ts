@@ -10,6 +10,11 @@ export const PORTFOLIO_MARKERS = [
 ];
 
 export const TEST_AUTOMATION_MARKERS = [
+  'automation',
+  'testing',
+  'steps',
+  'tools',
+  'framework',
   'programming',
   'python',
   'java',
