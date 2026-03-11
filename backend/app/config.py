@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     enable_ip_daily_token_limit: bool = True
     ip_daily_token_limit: int = Field(default=10000, ge=100, le=5000000)
     allowed_origins: str = "http://localhost:3000"
+    allowed_origin_regex: str = ""
     allowed_hosts: str = "localhost,127.0.0.1,testserver"
     enforce_https: bool = False
     rate_limit_requests: int = Field(default=20, ge=1, le=1000)
