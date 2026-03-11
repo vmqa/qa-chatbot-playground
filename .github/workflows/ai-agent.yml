@@ -22,9 +22,12 @@ jobs:
       - name: Comment pending owner approval
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          gh issue comment ${{ github.event.issue.number }} --body "⏳ **AI implementation requested** and now waiting for owner approval in GitHub Actions environment gate.
+          gh issue comment "${{ github.event.issue.number }}" \
+            --repo "$GH_REPO" \
+            --body "⏳ **AI implementation requested** and now waiting for owner approval in GitHub Actions environment gate.
 
           Approval link: ${RUN_URL}"
 
