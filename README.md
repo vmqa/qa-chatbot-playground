@@ -2,6 +2,12 @@
 
 Test Automation Sandbox with Chatbot
 
+## Live Demo
+
+🌐 **[qa-chatbot-playground.pages.dev](https://qa-chatbot-playground.pages.dev)**
+
+> The demo runs on a free tier with token usage restrictions. Responses may be slow or limited. For the best experience — and full control over rate limits and API usage — run the project locally with your own OpenAI API Key.
+
 ## About
 
 - Serve as a Playwright automation testing target
