@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 
 interface HeaderProps {
-  currentPage?: "home" | "blog";
+  currentPage?: "home" | "blog" | "about";
 }
 
 export default function Header({ currentPage = "home" }: HeaderProps) {
@@ -56,6 +56,17 @@ export default function Header({ currentPage = "home" }: HeaderProps) {
               }`}
             >
               Blog
+            </a>
+            <span className="text-[var(--border)]">|</span>
+            <a
+              href="/about"
+              className={`transition-colors cursor-pointer ${
+                currentPage === "about"
+                  ? "text-[var(--primary)] font-medium"
+                  : "text-[var(--text-secondary)] hover:text-[var(--primary)]"
+              }`}
+            >
+              About
             </a>
           </nav>
 
@@ -115,6 +126,17 @@ export default function Header({ currentPage = "home" }: HeaderProps) {
               onClick={() => setIsMenuOpen(false)}
             >
               Blog
+            </a>
+            <a
+              href="/about"
+              className={`block py-2 cursor-pointer ${
+                currentPage === "about"
+                  ? "text-[var(--primary)] font-medium"
+                  : "text-[var(--text-secondary)] hover:text-[var(--primary)]"
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              About
             </a>
           </div>
         )}
